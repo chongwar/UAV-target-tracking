@@ -1,25 +1,19 @@
+from _control import function_33, function_32, function_31
 from collections import deque, namedtuple
 import time
 
 kp = 1
-ki = 1
-kd = 1
-# load_len_31 = 12
-# load_len_32 = 1
-# load_len_33 = 44
-pkg_num = 0
+ki = 0.7
+kd = 0.3
+
 func_id = [0, 31, 32, 33]
-func_31 = namedtuple('func_31', ['pitch', 'roll', 'yaw', 'thrust', 'x_1', 'x_2'])
-func_32 = namedtuple('func_32', ['load_msg'])
-func_33 = namedtuple('func_33', ['ctrl_mode', 'offset_x', 'offset_y', 'height'])
-# initial func31, func32, func33
-f_31 = func_31(0, 0, 0, 0, 0, 0)
-f_32 = func_32(2)
-f_33 = func_33(4, 0, 0, 0)
+_func_31 = namedtuple('_func_31', ['pkg_num', 'pitch', 'roll', 'yaw', 'thrust', 'x_1', 'x_2'])
+_func_32 = namedtuple('_func_32', ['pkg_num', 'load_msg'])
+_func_33 = namedtuple('_func_33', ['pkg_num', 'ctrl_mode', 'offset_x', 'offset_y', 'height', 'yaw'])
 
 
 def get_plane_param(pkg_num, load_msg):
-    f_32 = func_32(load_msg)
+    f_32_param = _func_32(pkg_num, load_msg)
     info = {}
     return info
 
@@ -51,62 +45,74 @@ def adjust(posi_std, posi_now, error, dis=False):
     return delta
 
 
-def send(pkg_num, func_id, func_param):
+def send(func_id, func_param):
     if func_id == 31:
+        function_31(func_param)
         return 31
-    # if func_id == 32:
-    #     return []
+    if func_id == 32:
+        function_32(func_param)
+        return 32
     if func_id == 33:
+        function_33(func_param)
         return 33
 
 
-error_x = deque([200, 300, 400])
-# error_y = deque([200, 300, 400])
-error_dis = deque([10, 15, 20])
+def pid():
+    pkg_num = 0
+    error_x = deque([0, 0, 0])
+    # error_y = deque([200, 300, 400])
+    error_dis = deque([0, 0, 0])
 
-img_center = namedtuple('img_center', ['x', 'y'])
-posi_std = img_center(1920 / 2, 1080 / 2)
-dis_std = 4
-init_x = 0.5,
-init_dis = 5
-prev_x, prev_dis = init_x, init_dis
+    img_center = namedtuple('img_center', ['x', 'y'])
+    posi_std = img_center(1920 / 2, 1080 / 2)
+    dis_std = 4
+    init_x = 0.5
+    init_dis = 5
+    prev_x = init_x
+    prev_dis = init_dis
 
-# start the plane
-f_33.ctrl_mode = 4
-send(pkg_num, 33, f_33)
-pkg_num += 1
+    # start the plane
+    f_33_param = _func_33(pkg_num, 4, 0, 0, 0, 0)
+    send(33, f_33_param)
+    pkg_num += 1
 
-time_start = time.perf_counter()
-while True:
-    if time.perf_counter() - time_start >= 0.1:
-        plane_info = get_plane_param(pkg_num, 1)
-        pkg_num += 1
-        posi_bbox = get_bbox()
-        dis_now = get_dis()
-        delta_x = adjust(posi_std.x, posi_bbox.x, error_x)
-        delta_dis = adjust(dis_std, dis_now, error_dis, dis=True)
+    time_start = time.perf_counter()
+    while True:
+        # if pkg_num == 5:
+            # break
+        if time.perf_counter() - time_start >= 1:
+            plane_info = get_plane_param(pkg_num, 1)
+            pkg_num += 1
+            posi_bbox = get_bbox()
+            dis_now = get_dis()
+            delta_x = adjust(posi_std.x, posi_bbox.x, error_x)
+            delta_dis = adjust(dis_std, dis_now, error_dis, dis=True)
 
-        if delta_x == -1 and delta_dis == -1:
-            f_33 = func_33(2, 0, 0, 2)
+            if delta_x == -1 and delta_dis == -1:
+                f_33_param = _func_33(pkg_num, 2, 0, 0, 2, 0)
 
-        elif delta_x == -1:
-            dis = prev_dis + delta_dis
-            f_33 = func_33(2, 0, dis, 2)
-            prev_dis = dis
+            elif delta_x == -1:
+                dis = prev_dis + delta_dis
+                f_33_param = _func_33(pkg_num, 2, 0, dis, 2, 0)
+                prev_dis = dis
 
-        elif delta_dis == -1:
-            x = prev_x + delta_x
-            f_33 = func_33(2, x, 0, 2)
-            prev_x = x
+            elif delta_dis == -1:
+                x = prev_x + delta_x
+                f_33_param = _func_33(pkg_num, 2, x, 0, 2, 0)
+                prev_x = x
 
-        else:
-            dis = prev_dis + delta_dis
-            x = prev_x + delta_x
-            f_33 = func_33(2, x, dis, 2)
-            prev_dis = dis
-            prev_x = x
+            else:
+                dis = prev_dis + delta_dis
+                x = prev_x + delta_x
+                f_33_param = _func_33(pkg_num, 2, x, dis, 2, 0)
+                prev_dis = dis
+                prev_x = x
 
-        send(pkg_num, func_id[3], f_33)
-        pkg_num += 1
+            send(func_id[3], f_33_param)
+            pkg_num += 1
 
-        time_start = time.perf_counter()
+            time_start = time.perf_counter()
+
+
+if __name__ == '__main__':
+    pid()
