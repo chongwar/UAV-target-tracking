@@ -7,6 +7,8 @@
 #include <string.h>
 // #include <termbits.h>
 char read_buffer[100];
+float plane_info[10];
+
 // write to serial
 void serial_write(unsigned char* TxPack_Buffer, int length)
 {
@@ -184,6 +186,24 @@ void float_to_bytes(unsigned char* Buffer, float tag, int index)
 	}
 }
 
+// bytes -> float
+void bytes_to_float(unsigned char* Buffer, float* plane_info)
+{
+    unsigned char tmp[4];
+    int index = 0;
+    for (int i = 4; i <= 40; i+=4)
+    {
+        float f;
+        for (int j = 0; j < 4; j++)
+        {
+            tmp[j] = Buffer[i + j];
+        }
+        memcpy(&f, &tmp, 4);
+        // printf("%.2f\t", f);
+        plane_info[index++] = f;
+    }
+}
+
 // function id: 33 (main control)
 void function_33(unsigned short Pkg_Num, unsigned char Control_Mode, 
                  float Offset_PosX, float Offset_PosY, float Height, float Yaw)
@@ -234,7 +254,7 @@ void function_33(unsigned short Pkg_Num, unsigned char Control_Mode,
 }
 
 // function id: 32 (get plane parameters)
-char *function_32(unsigned short Pkg_Num, unsigned char Read_Mode)
+float *function_32(unsigned short Pkg_Num, unsigned char Read_Mode)
 {
 	unsigned char TxPack_Buffer[8] = {0};
 
@@ -259,7 +279,8 @@ char *function_32(unsigned short Pkg_Num, unsigned char Read_Mode)
     for(i = 0; i < 8; i++)
 		printf("%02x ", TxPack_Buffer[i]);
 	serial_read();
-    return read_buffer;
+    bytes_to_float(read_buffer, plane_info);
+    return plane_info;
 }
 
 // function id: 31 (gestures control)

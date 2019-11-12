@@ -2,7 +2,7 @@ from ctypes import *
 from collections import namedtuple
 import os
 
-control = CDLL('./control.so')
+control = CDLL('./control.so')  # call "c" file
 
 
 def function_33(*args):
@@ -19,7 +19,7 @@ def function_32(*args):
     for index, i in enumerate(*args):
         tmp.append(i)
     _function_32 = control.function_32
-    _function_32.restype = c_char_p
+    _function_32.restype = POINTER(c_float)  # return a pointer
     plane_info = _function_32(c_ushort(tmp[0]), c_char(tmp[1]))
     return plane_info
 
@@ -53,5 +53,10 @@ if __name__ == '__main__':
     function_33(f_33_1)
     function_33(f_33_2)
     function_33(f_33_3)
+    
     plane_info = function_32(f_32)
+    print("----- The information of this plane -----")
+    for i in range(10):
+        print('{:.1f}'.format(plane_info[i]), end='\t')
+    
     function_31(f_31)
