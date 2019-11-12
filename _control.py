@@ -19,7 +19,9 @@ def function_32(*args):
     for index, i in enumerate(*args):
         tmp.append(i)
     _function_32 = control.function_32
-    _function_32(c_ushort(tmp[0]), c_char(tmp[1]))
+    _function_32.restype = c_char_p
+    plane_info = _function_32(c_ushort(tmp[0]), c_char(tmp[1]))
+    return plane_info
 
 
 def function_31(*args):
@@ -51,5 +53,5 @@ if __name__ == '__main__':
     function_33(f_33_1)
     function_33(f_33_2)
     function_33(f_33_3)
-    function_32(f_32)
+    plane_info = function_32(f_32)
     function_31(f_31)

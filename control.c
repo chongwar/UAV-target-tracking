@@ -6,7 +6,7 @@
 #include <errno.h>   /* ERROR Number Definitions           */
 #include <string.h>
 // #include <termbits.h>
-
+char read_buffer[100];
 // write to serial
 void serial_write(unsigned char* TxPack_Buffer, int length)
 {
@@ -142,7 +142,7 @@ void serial_read()
 
     tcflush(fd, TCIFLUSH);   /* Discards old data in the rx buffer            */
 
-    char read_buffer[100];   /* Buffer to store the data received              */
+    // char read_buffer[100];   /* Buffer to store the data received              */
     int  bytes_read = 0;    /* Number of bytes read by the read() system call */
     int i = 0;
 
@@ -157,6 +157,7 @@ void serial_read()
     printf("\n +----------------------------------+\n");
 
     close(fd); /* Close the serial port */
+    // return read_buffer;
 }
 
 // double -> bytes
@@ -233,7 +234,7 @@ void function_33(unsigned short Pkg_Num, unsigned char Control_Mode,
 }
 
 // function id: 32 (get plane parameters)
-void function_32(unsigned short Pkg_Num, unsigned char Read_Mode)
+char *function_32(unsigned short Pkg_Num, unsigned char Read_Mode)
 {
 	unsigned char TxPack_Buffer[8] = {0};
 
@@ -258,6 +259,7 @@ void function_32(unsigned short Pkg_Num, unsigned char Read_Mode)
     for(i = 0; i < 8; i++)
 		printf("%02x ", TxPack_Buffer[i]);
 	serial_read();
+    return read_buffer;
 }
 
 // function id: 31 (gestures control)
