@@ -209,7 +209,7 @@ void function_33(unsigned short Pkg_Num, unsigned char Control_Mode,
                  float Offset_PosX, float Offset_PosY, float Height, float Yaw)
 {
 	unsigned char TxPack_Buffer[51] = {0};
-	// unsigned short Serial_Number = 0;
+    unsigned short Serial_Num = 0;
 	// unsigned char Control_Mode = 4, Nav_Mode = 1;
 	unsigned char Nav_Mode = 1;
 	double APIC_Lat = 0, APIC_Lon = 0;
@@ -217,11 +217,11 @@ void function_33(unsigned short Pkg_Num, unsigned char Control_Mode,
     unsigned char CK_A, CK_B;
     TxPack_Buffer[0] = 0xAA; // Frame header
     TxPack_Buffer[1] = 44; // Load length
-    TxPack_Buffer[2] += 1  ; // Packet sequence
+    TxPack_Buffer[2] = Pkg_Num  ; // Packet sequence
     TxPack_Buffer[3] = 33; // Function word
 
-    TxPack_Buffer[4] = Pkg_Num >> 8; // Controlled object serial number
-    TxPack_Buffer[5] = Pkg_Num & 0xff;
+    TxPack_Buffer[4] = Serial_Num >> 8; // Controlled object serial number
+    TxPack_Buffer[5] = Serial_Num & 0xff;
 
     TxPack_Buffer[6] = Control_Mode; // Control mode
     TxPack_Buffer[7] = Nav_Mode; // Navigation mode

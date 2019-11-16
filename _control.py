@@ -1,6 +1,7 @@
 from ctypes import *
 from collections import namedtuple
 import os
+import time
 
 control = CDLL('./control.so')  # call "c" file
 
@@ -34,7 +35,8 @@ def function_31(*args):
 
 
 if __name__ == '__main__':
-    os.system('picocom -b 57600 /dev/ttyUSB0')    
+    os.system('picocom -b 57600 /dev/ttyUSB0')
+    time.sleep(0.1)
 
     func_31 = namedtuple('func_31', ['pkg_num', 'pitch', 'roll', 'yaw', 'thrust', 'x_1', 'x_2'])
     func_32 = namedtuple('func_32', ['pkg_num', 'load_msg'])
@@ -51,12 +53,16 @@ if __name__ == '__main__':
     f_31 = func_31(pkg_num_5, 0, 0, 0, 550, 0, 0)
 
     function_33(f_33_1)
+    time.sleep(0.5)
     function_33(f_33_2)
+    time.sleep(0.5)
     function_33(f_33_3)
-    
+    time.sleep(0.5)
+
     plane_info = function_32(f_32)
     print("----- The information of this plane -----")
     for i in range(10):
         print('{:.1f}'.format(plane_info[i]), end='\t')
-    
+    time.sleep(0.5)
+
     function_31(f_31)
