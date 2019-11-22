@@ -96,12 +96,12 @@ def get_plane_param(pkg_num, load_msg):
     return info
 
 
-def auto_track():
-    """
-    function id: 31
-    :return:
-    """
-    pass
+# def auto_track():
+#     """
+#     function id: 31
+#     :return:
+#     """
+#     pass
 
 
 def pid():
@@ -140,7 +140,8 @@ def pid():
 
             if delta_x == -1 and delta_dis == -1:
                 f_33_param = _func_33(pkg_num, 2, 0, 0, 2, 0)
-                auto_track()
+                continue
+                # auto_track()
 
             elif delta_x == -1:
                 # dis = prev_dis + delta_dis
